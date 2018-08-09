@@ -11,6 +11,7 @@
 #include <queue>
 #include <iomanip>
 #include "fasttext.h"
+#include "compact_dictionary.h"
 #include "args.h"
 
 using namespace fasttext;
@@ -32,6 +33,7 @@ void printUsage() {
     << "  nn                      query for nearest neighbors\n"
     << "  analogies               query for analogies\n"
     << "  dump                    dump arguments,dictionary,input/output vectors\n"
+    << "  generate-compact        generate a compact binary file\n"
     << std::endl;
 }
 
@@ -80,6 +82,13 @@ void printPrintNgramsUsage() {
     << "usage: fasttext print-ngrams <model> <word>\n\n"
     << "  <model>      model filename\n"
     << "  <word>       word to print\n"
+    << std::endl;
+}
+
+void printGenerateCompactUsage() {
+  std::cerr
+    << "usage: fasttext generate-compact <model> <save-dir>\n\n"
+    << "  <model>      model filename\n"
     << std::endl;
 }
 
@@ -237,6 +246,22 @@ void printNgrams(const std::vector<std::string> args) {
   exit(0);
 }
 
+void generateCompact(const std::vector<std::string> args) {
+  if (args.size() != 3) {
+    printGenerateCompactUsage();
+    exit(EXIT_FAILURE);
+  }
+  FastText fasttext;
+  fasttext.loadModel(std::string(args[2]));
+    
+  std::vector<int64_t> freqs = fasttext.getDictionary()->getCounts(fasttext::entry_type(0));
+  
+  printf("Writing compact model\n");
+  ((CompactDictionary*)fasttext.getDictionary().get())->writeCompact("wiki_word.bin", "wiki_data.bin", args.size() == 4 ? args[3] : "", fasttext, 50000);
+  printf("done");
+  exit(0);
+}
+
 void nn(const std::vector<std::string> args) {
   int32_t k;
   if (args.size() == 3) {
@@ -365,6 +390,8 @@ int main(int argc, char** argv) {
     predict(args);
   } else if (command == "dump") {
     dump(args);
+  } else if (command == "generate-compact") {
+    generateCompact(args);
   } else {
     printUsage();
     exit(EXIT_FAILURE);
