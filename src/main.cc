@@ -247,7 +247,7 @@ void printNgrams(const std::vector<std::string> args) {
 }
 
 void generateCompact(const std::vector<std::string> args) {
-  if (args.size() != 3) {
+  if (args.size() < 3) {
     printGenerateCompactUsage();
     exit(EXIT_FAILURE);
   }

@@ -34,6 +34,8 @@ GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
 PROTOS_PATH = ./protos
 
+DEPS = ../args.o ../dictionary.o ../compact_dictionary.o ../productquantizer.o ../matrix.o ../qmatrix.o ../vector.o ../model.o ../utils.o ../fasttext.o
+
 vpath %.proto $(PROTOS_PATH)
 
 all: wv_client wv_server
@@ -42,7 +44,7 @@ wv_client: WordVector.pb.o WordVector.grpc.pb.o wv_client.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 wv_server: WordVector.pb.o WordVector.grpc.pb.o wv_server.o
-	$(CXX) $^ $(LDFLAGS) -o $@
+	$(CXX) $^ $(LDFLAGS) $(DEPS) -o $@
 
 
 .PRECIOUS: %.grpc.pb.cc

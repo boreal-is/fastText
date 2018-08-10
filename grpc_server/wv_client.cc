@@ -49,7 +49,15 @@ class WordVectorClient {
     DetectLanguagesRequest request;
     WordVector::GetVectorsRequest gv_request;
     request.add_texts();
-    request.set_texts(0, word1);
+    request.set_texts(0, "Bonjour Robert, comment vas-tu?");
+    request.add_texts();
+    request.set_texts(1, "Hi Robert, how are you?");
+    request.add_texts();
+    request.set_texts(2, "a$qwq$$ ad# sd%*fajn laskfd dfskdfs");
+    request.add_texts();
+    request.set_texts(3, "");
+    request.add_texts();
+    request.set_texts(3, "Merhaba Robert, nasılsın?");
     gv_request.add_tokens();
     gv_request.set_tokens(0, word1);
     gv_request.add_tokens();
@@ -71,7 +79,11 @@ class WordVectorClient {
     // Act upon its status.
     if (status.ok()) 
     {
-        printf("%s\n", reply.results()[0].text().c_str());
+        for(size_t i = 0; i < reply.results_size(); ++i)
+        {
+            WordVector::DetectedLanguage lang = reply.results(i);
+            printf("%s => %s (%ld)\n", lang.text().c_str(), lang.language().c_str(), reply.results_size());
+        }
     } 
     else 
     {
@@ -81,12 +93,12 @@ class WordVectorClient {
     }
     if (gv_status.ok()) 
     {
-        printf("%f\n", gv_reply.vectors()[0].frequency());//  .results()[0].text().c_str());
+        printf("frequency %f\n", gv_reply.vectors()[0].frequency());//  .results()[0].text().c_str());
         
         const float* v1 = reinterpret_cast<const float*>(gv_reply.vectors()[0].data().data());
         const float* v2 = reinterpret_cast<const float*>(gv_reply.vectors()[1].data().data());
         double mult = 0.0, sz1 = 0.0, sz2 = 0.0;
-        for(int i = 0; i < 300; ++i)
+        for(int i = 280; i < 300; ++i)
         {
             printf("> %f %f\n", v1[i], v2[i]);
             mult+=v1[i]*v2[i];
@@ -101,7 +113,7 @@ class WordVectorClient {
                   << std::endl;
         printf("gv RPC failed\n");
     }
-    return std::string("Salut");
+    return std::string("");
   }
 
  private:
@@ -109,25 +121,27 @@ class WordVectorClient {
 };
 
 int main(int argc, char** argv) {
-  // Instantiate the client. It requires a channel, out of which the actual RPCs
-  // are created. This channel models a connection to an endpoint (in this case,
-  // localhost at port 50051). We indicate that the channel isn't authenticated
-  // (use of InsecureChannelCredentials()).
-  WordVectorClient wv(grpc::CreateChannel("192.168.110.21:50051", grpc::InsecureChannelCredentials()));
-  std::string word1, word2;
-  if(argc > 1)
-      word1 = argv[1];
-  else
-      word1 = "le";
+    // Instantiate the client. It requires a channel, out of which the actual RPCs
+    // are created. This channel models a connection to an endpoint (in this case,
+    // localhost at port 50051). We indicate that the channel isn't authenticated
+    // (use of InsecureChannelCredentials()).
+    
+    std::string word1, word2;
+    if(argc > 1)
+        word1 = argv[1];
+    else
+        word1 = "hello";
+    if(argc > 2)
+        word2 = argv[2];
+    else
+        word2 = "world";
+    if(argc > 3)
+        word2 = argv[3];
+    else
+        word2 = "192.168.2.46:50052";
+    WordVectorClient wv(grpc::CreateChannel(argv[3], grpc::InsecureChannelCredentials()));
+    std::string reply = wv.SayHello(word1,word2);
   
-  if(argc > 2)
-      word2 = argv[2];
-  else
-      word2 = "bonjour";
-      
-  std::string reply = wv.SayHello(word1,word2);
-  std::cout << "Greeter received: " << reply << std::endl;
-  std::cout << "language: " << reply << std::endl;
 
   return 0;
 }

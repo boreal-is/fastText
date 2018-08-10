@@ -20,8 +20,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sstream>
 #include <grpcpp/grpcpp.h>
-
+#include "../src/fasttext.h"
 
 #include "WordVector.grpc.pb.h"
 
@@ -78,6 +79,7 @@ class Dictionary
 };
 
 Dictionary* dict;
+fasttext::FastText* ft;
 
 VectorResult Dictionary::getWordInfo(std::string& word)
 {
@@ -90,7 +92,7 @@ VectorResult Dictionary::getWordInfo(std::string& word)
     ret.freq = freqs[nrwords-1];
     ret.data.resize(ndim, 0.0);
     //if(!isdot && idx < nrwords)
-    if(idx < nrwords)
+    if(idx != -1 && idx < nrwords && idx < nrwords+nsubs_bucket)
     {
         ret.freq = freqs[idx];
         //memcpy(ret.data.data(), &(top_words[idx*2*ndim+(isdot ? 1 : 0)]), ndim*sizeof(float));
@@ -220,9 +222,23 @@ class WordVectorImpl final : public WordVector::WordVector::Service {
     Status DetectLanguages(ServerContext* context, const DetectLanguagesRequest* request, 
                           DetectLanguagesReply* response) override 
     {
-        WordVector::DetectedLanguage* value = response->add_results();
-        value->set_language("fr");
-        value->set_text(request->texts(0));
+        int32_t ntexts = request->texts_size();
+        for(int32_t i = 0; i < ntexts; ++i)
+        {
+            std::vector<std::pair<float,std::string> > predictions(1);
+            std::string s = ""+request->texts(i);
+            std::stringstream ss(s);
+            ft->predict(ss, 1, predictions, 0.0);
+            WordVector::DetectedLanguage* value = response->add_results();
+            if(predictions.size() > 0)
+                if(predictions[0].second.substr(0,9) == "__label__")
+                    value->set_language(predictions[0].second.substr(9));
+                else
+                    value->set_language(predictions[0].second);
+            else
+                value->set_language("unk");
+            value->set_text(request->texts(i));
+        }
         
         return Status::OK;
     }
@@ -237,7 +253,7 @@ class WordVectorImpl final : public WordVector::WordVector::Service {
         {
             std::string token = request->tokens(i);
             VectorResult result = dict->getWordInfo(token);
-            printf("%s %f %ld\n", token.c_str(), result.freq, result.ndim);
+            printf("%s %f %d\n", token.c_str(), result.freq, result.ndim);
             WordVector::Vector* vec = response->add_vectors();
             vec->set_frequency(result.freq);                
             vec->set_data(result.data.data(), result.ndim*sizeof(float));
@@ -269,13 +285,18 @@ void RunServer(std::string url ) {
 
 int main(int argc, char** argv) {
 
-    std::string path = "wiki_data_fr.bin";
+    std::string path = "wiki_data_en.bin";
     std::string url = "localhost:50051";
+    std::string lang_model_path = "lid.176.bin";
     if(argc > 1)
         path = argv[1];
     if(argc > 2)
         url = argv[2];
+    if(argc > 3)
+        lang_model_path = argv[3];
     dict = new Dictionary(path);
+    ft = new fasttext::FastText();
+    ft->loadModel(lang_model_path);
     RunServer(url);
 
   return 0;
