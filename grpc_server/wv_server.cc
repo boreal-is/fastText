@@ -122,7 +122,7 @@ void Dictionary::load(std::string filename)
     freqs.resize(nwords_bucket+nsubs_bucket);
     top_words.resize(nrwords*ndim);
     mins_maxs.resize(nsubs_bucket*2);
-    sub_vecs.resize(nsubs_bucket*ndim);
+    sub_vecs.resize(nsubs_bucket*ndim/2);
     fread(hash2id.data(), sizeof(int32_t), nwords_bucket+nsubs_bucket, fd);
     fread(chars.data(), sizeof(char), nchars, fd);
     
@@ -139,8 +139,6 @@ void Dictionary::load(std::string filename)
         ++pos;
         words[i] = &(chars[pos]);
     }
-    
-    float size = 0.0;
 }
 
 uint32_t Dictionary::hash(std::string& str)  

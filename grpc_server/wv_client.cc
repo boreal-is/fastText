@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
     // localhost at port 50051). We indicate that the channel isn't authenticated
     // (use of InsecureChannelCredentials()).
     
-    std::string word1, word2;
+    std::string word1, word2, url;
     if(argc > 1)
         word1 = argv[1];
     else
@@ -138,10 +138,10 @@ int main(int argc, char** argv) {
     else
         word2 = "world";
     if(argc > 3)
-        word2 = argv[3];
+        url = argv[3];
     else
-        word2 = "192.168.2.46:50052";
-    WordVectorClient wv(grpc::CreateChannel(argv[3], grpc::InsecureChannelCredentials()));
+        url = "localhost:50052";
+    WordVectorClient wv(grpc::CreateChannel(url, grpc::InsecureChannelCredentials()));
     std::string reply = wv.SayHello(word1,word2);
 
   
