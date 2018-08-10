@@ -79,11 +79,10 @@ class WordVectorClient {
     // Act upon its status.
     if (status.ok()) 
     {
-        printf("... => ...\n");
         for(size_t i = 0; i < reply.results_size(); ++i)
         {
             WordVector::DetectedLanguage lang = reply.results(i);
-            printf("%s => %s (%ld)\n", lang.text().c_str(), lang.language().c_str(), reply.results_size());
+            printf("%s => %s (%d)\n", lang.text().c_str(), lang.language().c_str(), reply.results_size());
         }
         printf("Call to DetectLanguages OK\n");
     } 
@@ -100,6 +99,7 @@ class WordVectorClient {
         const float* v1 = reinterpret_cast<const float*>(gv_reply.vectors()[0].data().data());
         const float* v2 = reinterpret_cast<const float*>(gv_reply.vectors()[1].data().data());
         double mult = 0.0, sz1 = 0.0, sz2 = 0.0;
+        printf(">     ...      ...\n");
         for(int i = 280; i < 300; ++i)
         {
             printf("> %f %f\n", v1[i], v2[i]);
