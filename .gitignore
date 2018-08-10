@@ -5,3 +5,5 @@
 data
 fasttext
 result
+grpc_server/wv_client
+grpc_server/wv_server
