@@ -79,11 +79,13 @@ class WordVectorClient {
     // Act upon its status.
     if (status.ok()) 
     {
+        printf("... => ...\n");
         for(size_t i = 0; i < reply.results_size(); ++i)
         {
             WordVector::DetectedLanguage lang = reply.results(i);
             printf("%s => %s (%ld)\n", lang.text().c_str(), lang.language().c_str(), reply.results_size());
         }
+        printf("Call to DetectLanguages OK\n");
     } 
     else 
     {
@@ -106,6 +108,7 @@ class WordVectorClient {
             sz2+=v2[i]*v2[i];
         }
         printf("a*b = %f (%f %f)\n", mult/sqrt(sz1*sz2), sz1, sz2);
+        printf("Call to GetVectors OK\n");
     } 
     else 
     {
@@ -141,6 +144,7 @@ int main(int argc, char** argv) {
         word2 = "192.168.2.46:50052";
     WordVectorClient wv(grpc::CreateChannel(argv[3], grpc::InsecureChannelCredentials()));
     std::string reply = wv.SayHello(word1,word2);
+
   
 
   return 0;

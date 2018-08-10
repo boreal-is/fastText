@@ -16,9 +16,9 @@
 
 HOST_SYSTEM = $(shell uname | cut -f 1 -d_)
 SYSTEM ?= $(HOST_SYSTEM)
-CXX = g++ -O2
+CXX = g++
 CPPFLAGS += `pkg-config --cflags protobuf grpc`
-CXXFLAGS += -std=c++11
+CXXFLAGS += -pthread -std=c++0x -march=native -O3 -funroll-loops
 ifeq ($(SYSTEM),Darwin)
 LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
            -lgrpc++_reflection\
@@ -41,10 +41,10 @@ vpath %.proto $(PROTOS_PATH)
 all: wv_client wv_server
 
 wv_client: WordVector.pb.o WordVector.grpc.pb.o wv_client.o
-	$(CXX) $^ $(LDFLAGS) -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
 wv_server: WordVector.pb.o WordVector.grpc.pb.o wv_server.o
-	$(CXX) $^ $(LDFLAGS) $(DEPS) -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(DEPS) -o $@
 
 
 .PRECIOUS: %.grpc.pb.cc
