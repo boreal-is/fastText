@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <grpcpp/grpcpp.h>
+#include <grpc++/grpc++.h>
 #include "../src/fasttext.h"
 
 #include "WordVector.grpc.pb.h"

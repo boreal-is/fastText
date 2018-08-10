@@ -7,3 +7,7 @@ fasttext
 result
 grpc_server/wv_client
 grpc_server/wv_server
+grpc_server/WordVector.grpc.pb.cc
+grpc_server/WordVector.grpc.pb.h
+grpc_server/WordVector.pb.cc
+grpc_server/WordVector.pb.h

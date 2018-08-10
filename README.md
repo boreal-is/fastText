@@ -45,7 +45,7 @@ Where wiki_data.bin is the generated binary file in the first step.
 
 To run the service with DetectLanguages:
 ```
-$ ./wv_server ../wiki_data_fr.bin 192.168.2.46:50052 ~/Downloads/lid.176.bin
+$ ./wv_server ../wiki_data_fr.bin 192.168.2.46:50052 lid.176.bin
 ```
 Where lid.176.bin can be download at [https://s3-us-west-1.amazonaws.com/fasttext-vectors/supervised_models/lid.176.bin].
 

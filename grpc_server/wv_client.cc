@@ -19,9 +19,8 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
-#include <grpcpp/grpcpp.h>
-
+#include <cmath>
+#include <grpc++/grpc++.h>
 
 #include "WordVector.grpc.pb.h"
 
