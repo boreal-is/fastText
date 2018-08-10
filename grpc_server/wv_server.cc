@@ -78,8 +78,8 @@ class Dictionary
     std::vector<uint8_t> sub_vecs;
 };
 
-Dictionary* dict;
-fasttext::FastText* ft;
+Dictionary* dict = NULL;
+fasttext::FastText* ft = NULL;
 
 VectorResult Dictionary::getWordInfo(std::string& word)
 {
@@ -214,10 +214,6 @@ std::vector<float> Dictionary::toFloat(uint8_t* v, float min, float max)
     return r;
 }
 
-
-
-
-
 class WordVectorImpl final : public WordVector::WordVector::Service {
     Status DetectLanguages(ServerContext* context, const DetectLanguagesRequest* request, 
                           DetectLanguagesReply* response) override 
@@ -228,13 +224,18 @@ class WordVectorImpl final : public WordVector::WordVector::Service {
             std::vector<std::pair<float,std::string> > predictions(1);
             std::string s = ""+request->texts(i);
             std::stringstream ss(s);
-            ft->predict(ss, 1, predictions, 0.0);
             WordVector::DetectedLanguage* value = response->add_results();
-            if(predictions.size() > 0)
-                if(predictions[0].second.substr(0,9) == "__label__")
-                    value->set_language(predictions[0].second.substr(9));
+            if(ft != NULL)
+            {
+                ft->predict(ss, 1, predictions, 0.0);
+                if(predictions.size() > 0)
+                    if(predictions[0].second.substr(0,9) == "__label__")
+                        value->set_language(predictions[0].second.substr(9));
+                    else
+                        value->set_language(predictions[0].second);
                 else
-                    value->set_language(predictions[0].second);
+                    value->set_language("unk");
+            }
             else
                 value->set_language("unk");
             value->set_text(request->texts(i));
@@ -283,20 +284,24 @@ void RunServer(std::string url ) {
     server->Wait();
 }
 
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv) 
+{
     std::string path = "wiki_data_en.bin";
     std::string url = "localhost:50051";
-    std::string lang_model_path = "lid.176.bin";
+    std::string lang_model_path = "";
     if(argc > 1)
         path = argv[1];
     if(argc > 2)
         url = argv[2];
     if(argc > 3)
         lang_model_path = argv[3];
+        
     dict = new Dictionary(path);
-    ft = new fasttext::FastText();
-    ft->loadModel(lang_model_path);
+    if(lang_model_path != "") 
+    {
+        ft = new fasttext::FastText();
+        ft->loadModel(lang_model_path);
+    }
     RunServer(url);
 
   return 0;
