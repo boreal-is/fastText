@@ -95,8 +95,8 @@ void CompactDictionary::writeCompact(std::string word_fn, std::string data_fn, s
         fread(map_.data(), sizeof(double), n_*n_, fmap);
         for(int i = 0; i < n_*n_; ++i)
             map[i] = (float)map_[i];
+        fclose(fmap);
     }
-    fclose(fmap);
 
     fwrite(&nwords_, sizeof(int32_t), 1, fd); // Number of words
     fwrite(&nrwords, sizeof(int32_t), 1, fd); // Number of restricted words
