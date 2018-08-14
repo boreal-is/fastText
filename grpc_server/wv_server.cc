@@ -119,7 +119,7 @@ void Dictionary::load(std::string filename)
     hash2id.resize(nwords_bucket+nsubs_bucket);
     chars.resize(nchars);
     words.resize(nrwords);
-    freqs.resize(nwords_bucket+nsubs_bucket);
+    freqs.resize(nrwords+nsubs_bucket);
     top_words.resize(nrwords*ndim);
     mins_maxs.resize(nsubs_bucket*2);
     sub_vecs.resize(nsubs_bucket*ndim/2);

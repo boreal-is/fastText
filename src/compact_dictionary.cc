@@ -139,7 +139,7 @@ void CompactDictionary::writeCompact(std::string word_fn, std::string data_fn, s
     
     printf("Processing freq... ");
     // freq
-    for(int i = 0; i < nwords_bucket; ++i)
+    for(int i = 0; i < nrwords; ++i)
     {
         float freq = words_[i].count/double(ntokens_);
         fwrite(&freq, sizeof(float), 1, fd); 
