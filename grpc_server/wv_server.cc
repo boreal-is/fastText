@@ -126,7 +126,7 @@ void Dictionary::load(std::string filename)
     fread(hash2id.data(), sizeof(int32_t), nwords_bucket+nsubs_bucket, fd);
     fread(chars.data(), sizeof(char), nchars, fd);
     
-    fread(freqs.data(), sizeof(int32_t), nwords_bucket+nsubs_bucket, fd);
+    fread(freqs.data(), sizeof(int32_t), nrwords+nsubs_bucket, fd);
     fread(top_words.data(), sizeof(float), nrwords*ndim, fd);
     fread(sub_vecs.data(), sizeof(uint8_t), nsubs_bucket*ndim/2, fd);
     fread(mins_maxs.data(), sizeof(float), nsubs_bucket*2, fd);
